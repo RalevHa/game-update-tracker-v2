@@ -37,7 +37,7 @@
       </section>
 
       <section v-if="currentGame" class="rounded-xl border border-slate-200 bg-white/80 backdrop-blur p-4 shadow">
-        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
+        <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 mb-4">
           <div class="flex-1">
             <h2 class="text-2xl font-semibold text-slate-800">
               <template v-if="!editMode">{{ currentGame.name }}</template>
