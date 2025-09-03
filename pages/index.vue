@@ -7,10 +7,33 @@
       </header>
 
       <section class="mb-6 rounded-xl border border-slate-200 bg-white/70 backdrop-blur p-4 shadow-sm">
-        <label class="block text-sm font-medium text-slate-700 mb-1">Select game</label>
-        <select v-model="selectedGame" class="w-full appearance-none rounded-lg border border-slate-300 bg-white px-3 py-2 text-slate-800 shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
-          <option v-for="game in games" :key="game.id" :value="game.id">{{ game.name }}</option>
-        </select>
+        <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-2 mb-2">
+          <div class="flex-1">
+            <label class="block text-sm font-medium text-slate-700 mb-1">Select game</label>
+            <select v-model="selectedGame" class="w-full appearance-none rounded-lg border border-slate-300 bg-white px-3 py-2 text-slate-800 shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+              <option v-for="game in games" :key="game.id" :value="game.id">{{ game.name }}</option>
+            </select>
+          </div>
+          <button @click="showNewGame = true" class="mt-2 sm:mt-0 inline-flex items-center gap-1 rounded-lg bg-indigo-600 px-4 py-2 text-white shadow hover:bg-indigo-700">＋ Add New Game</button>
+        </div>
+
+        <Transition name="fade">
+          <form v-if="showNewGame" @submit.prevent="addNewGame" class="mt-4 rounded-lg border border-slate-300 bg-white p-4 shadow space-y-3">
+            <div class="flex flex-col sm:flex-row gap-3">
+              <label class="flex-1 text-sm text-slate-700">Game Name
+                <input v-model="newGame.name" class="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="e.g. Minecraft" required />
+              </label>
+              <label class="flex-1 text-sm text-slate-700">Game ID
+                <input v-model="newGame.id" class="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="e.g. minecraft" required />
+              </label>
+            </div>
+            <div class="flex gap-2">
+              <button type="submit" class="inline-flex items-center gap-1 rounded-lg bg-emerald-600 px-4 py-2 text-white shadow hover:bg-emerald-700">✔ Add Game</button>
+              <button type="button" @click="cancelNewGame" class="inline-flex items-center gap-1 rounded-lg bg-slate-300 px-4 py-2 text-slate-900 shadow hover:bg-slate-400">✖ Cancel</button>
+            </div>
+            <div v-if="newGameError" class="text-red-600 text-sm mt-2">{{ newGameError }}</div>
+          </form>
+        </Transition>
       </section>
 
       <section v-if="currentGame" class="rounded-xl border border-slate-200 bg-white/80 backdrop-blur p-4 shadow">
@@ -89,6 +112,7 @@
 </template>
 
 <script setup>
+
 import { ref, computed, onMounted } from 'vue'
 import { DateTime } from 'luxon'
 
@@ -97,6 +121,11 @@ const selectedGame = ref('')
 const currentGame = computed(() => games.value.find(g => g.id === selectedGame.value))
 const editMode = ref(false)
 const editableGame = ref({ id: '', name: '', updates: [] })
+
+// New game form state
+const showNewGame = ref(false)
+const newGame = ref({ name: '', id: '' })
+const newGameError = ref('')
 
 onMounted(async () => {
   const stored = localStorage.getItem('gamesData')
@@ -114,6 +143,29 @@ onMounted(async () => {
   }
   selectedGame.value = games.value[0]?.id || ''
 })
+
+function cancelNewGame() {
+  showNewGame.value = false
+  newGame.value = { name: '', id: '' }
+  newGameError.value = ''
+}
+
+function addNewGame() {
+  const name = newGame.value.name.trim()
+  const id = newGame.value.id.trim()
+  if (!name || !id) {
+    newGameError.value = 'Name and ID are required.'
+    return
+  }
+  if (games.value.some(g => g.id === id)) {
+    newGameError.value = 'Game ID already exists.'
+    return
+  }
+  games.value.push({ id, name, updates: [] })
+  persist()
+  selectedGame.value = id
+  cancelNewGame()
+}
 
 function formatDate(dateStr) {
   const date = new Date(dateStr)

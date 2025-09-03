@@ -21,6 +21,17 @@
           "note": "New Character Evernight"
         }
       ]
+    },
+    {
+      "id": "zenless",
+      "name": "Zenless Zone Zero",
+      "updates": [
+        {
+          "version": "2.2",
+          "date": "2025-09-04T10:00",
+          "note": "Add New Character."
+        }
+      ]
     }
   ]
 }
