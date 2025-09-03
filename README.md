@@ -1,0 +1,1 @@
+just a game update tracker created with nuxt and tailwind
