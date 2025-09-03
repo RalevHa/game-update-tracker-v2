@@ -122,7 +122,6 @@ const currentGame = computed(() => games.value.find(g => g.id === selectedGame.v
 const editMode = ref(false)
 const editableGame = ref({ id: '', name: '', updates: [] })
 
-// New game form state
 const showNewGame = ref(false)
 const newGame = ref({ name: '', id: '' })
 const newGameError = ref('')
